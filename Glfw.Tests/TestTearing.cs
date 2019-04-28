@@ -22,13 +22,6 @@ namespace Glfw3.Tests
         {
             [Option('f', HelpText = "create full screen window")]
             public bool Fullscreen { get; set; }
-
-            [HelpOption(HelpText = "Display this help screen.")]
-            public string GetUsage()
-            {
-                return HelpText.AutoBuild(this,
-                  (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
-            }
         }
 
         static void UpdateWindowTitle(Glfw.Window window)
@@ -92,8 +85,6 @@ namespace Glfw3.Tests
         {
             Init();
 
-            var options = new Options();
-
             int width, height;
             float position;
             ulong frameCount = 0;
@@ -101,10 +92,10 @@ namespace Glfw3.Tests
             bool fullscreen = false;
             var monitor = Glfw.Monitor.None;
             Glfw.Window window;
-            
-            if (Parser.Default.ParseArguments(args, options))
-                fullscreen = options.Fullscreen;
 
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options => fullscreen = options.Fullscreen);
+                
             if (!Glfw.Init())
                 Environment.Exit(1);
 

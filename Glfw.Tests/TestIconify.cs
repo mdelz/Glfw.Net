@@ -26,13 +26,6 @@ namespace Glfw3.Tests
 
             [Option('n', HelpText = "No automatic iconification of full screen windows")]
             public bool AutoIconify { get; set; }
-
-            [HelpOption(HelpText = "Display this help screen.")]
-            public string GetUsage()
-            {
-                return HelpText.AutoBuild(this,
-                  (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
-            }
         }
 
         static void KeyCallback(Glfw.Window window, Glfw.KeyCode key, int scancode, Glfw.InputState state, Glfw.KeyMods mods)
@@ -181,14 +174,13 @@ namespace Glfw3.Tests
             bool autoIconify = true, fullscreen = false, allMonitors = false;
             Glfw.Window[] windows;
 
-            var options = new Options();
-
-            if (Parser.Default.ParseArguments(args, options))
-            {
-                autoIconify = options.AutoIconify;
-                fullscreen = options.Fullscreen;
-                allMonitors = options.AllMonitors;
-            }
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options =>
+                {
+                    autoIconify = options.AutoIconify;
+                    fullscreen = options.Fullscreen;
+                    allMonitors = options.AllMonitors;
+                });
 
             if (!Glfw.Init())
                 Environment.Exit(1);

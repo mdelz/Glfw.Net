@@ -32,15 +32,8 @@ namespace Glfw3.Tests
             [Option('f', HelpText = "Use full screen")]
             public bool Fullscreen { get; set; }
 
-            [Option('n', HelpText = "The number of windows to create", DefaultValue = 1)]
+            [Option('n', HelpText = "The number of windows to create", Default = 1)]
             public int WindowCount { get; set; }
-
-            [HelpOption(HelpText = "Display this help screen.")]
-            public string GetUsage()
-            {
-                return HelpText.AutoBuild(this,
-                  (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
-            }
         }
 
         static string GetKeyName(Glfw.KeyCode key)
@@ -446,15 +439,14 @@ namespace Glfw3.Tests
             Glfw.SetMonitorCallback(MonitorCallback);
             Glfw.SetJoystickCallback(JoystickCallback);
 
-            var options = new Options();
-            
-            if (Parser.Default.ParseArguments(args, options))
-            {
-                if (options.Fullscreen)
-                    Glfw.GetPrimaryMonitor();
-                else
-                    count = options.WindowCount;
-            }
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(options =>
+                {
+                    if (options.Fullscreen)
+                        Glfw.GetPrimaryMonitor();
+                    else
+                        count = options.WindowCount;
+                });
 
             if (monitor)
             {
